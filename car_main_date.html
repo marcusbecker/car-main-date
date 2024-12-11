@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .service-detail {
+            float: left;
+            background-color: #edebeb;
+            width: 250px;
+            padding: 6px;
+            height: 250px;
+            margin: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="dv-services">
+        <div class="service-detail">
+            <h2>Óleo motor + filtro</h2>
+            <strong>Change info</strong>
+            <p>Months: 12 Km: 10</p>
+            <strong>Change info</strong>
+            <p>lastDate, lastKm</p>
+        </div>
+    </div>
+
+
+    <script>
+        //Automobile
+        //Maintenance
+        class Service {
+            constructor(service) {
+                this.service = service;
+            }
+
+            getValidateDate(compareDate) {
+                if (this.service.months > 0 && this.service.lastDate) {
+                    const validateDate = new Date(this.service.lastDate);
+                    validateDate.setMonth(validateDate.getMonth() + this.service.months);
+
+                    return validateDate;
+                }
+
+                return null;
+            }
+
+            getValidateKm(compareKm) {
+                if (this.service.km > 0 && this.service.lastKm > 0) {
+                    return this.service.lastKm + (this.service.km * 1000);
+                }
+
+                return 0;
+            }
+        }
+
+        function frmDate(inDate, strLocation) {
+            return inDate.toLocaleDateString(strLocation);
+        }
+
+        function frmKm(inKm, strLocation) {
+            return inKm.toLocaleString(strLocation);
+        }
+
+        function serviceToHTML(services) {
+            let content = "";
+
+            for (let s of services) {
+                const valDate = s.getValidateDate(dt);
+                const ValKm = s.getValidateKm(carKm);
+
+                content += `<div class="service-detail"><h2>${s.service.name}</h2>`;
+                content += `<strong>Change info</strong><p>Months: ${s.service.months} Km: ${frmKm(s.service.km * 1000, "pt-BR")}</p>`;
+                content += `<p><strong>Next Change info</strong></p>`;
+
+                if (valDate) {
+                    if (dt >= valDate) {
+                        content += `<span class="cls-urgente">!!!</span>`;
+                    } else {
+                        content += `<span class="cls-okay"></span>`;
+                    }
+
+                    content += `<span><strong>Date to next change</strong> ${frmDate(valDate, "pt-BR")}</span></br>`;
+                }
+
+                if (ValKm > 0) {
+                    if (carKm >= ValKm) {
+                        content += `<span class="cls-urgente">!!!</span>`;
+                    } else {
+                        content += `<span class="cls-okay"></span>`;
+                    }
+
+                    content += `<span><strong>Km to next change</strong> ${frmKm(ValKm, "pt-BR")}</span></br>`;
+                }
+
+                content += `</div>`;
+            }
+
+            return content;
+        }
+
+        const carKm = 87000;
+        const dt = new Date();
+        const services = [];
+
+        //services.push({name: "", months: 0, km: 0, lastDate: new Date(), lastKm: 0 });
+        services.push(new Service({ name: "Óleo motor + filtro", months: 12, km: 10, lastDate: new Date("2024/11/01"), lastKm: 92000 }));
+        services.push(new Service({ name: "Correia dentada", months: 0, km: 260, lastDate: null, lastKm: 0 }));
+        services.push(new Service({ name: "Filtro de ar", months: 0, km: 40, lastDate: new Date("2024/11/01"), lastKm: 69629 }));
+        services.push(new Service({ name: "Velas", months: 0, km: 40, lastDate: new Date("2020/07/01"), lastKm: 70600 }));
+        services.push(new Service({ name: "Filtro Combustível", months: 24, km: 20, lastDate: new Date("2024/11/01"), lastKm: 69629 }));
+        services.push(new Service({ name: "Liq. arrefecimento (substituição)", months: 72, km: 160, lastDate: new Date("2018/04/01"), lastKm: 0 }));
+        services.push(new Service({ name: "Tampa reservatório expansão", months: 36, km: 0, lastDate: new Date("2018/04/01"), lastKm: 0 }));
+        services.push(new Service({ name: "Verificar transmissão", months: 6, km: 0, lastDate: new Date("2018/04/01"), lastKm: 0 }));
+        services.push(new Service({ name: "Fluído embreagem", months: 12, km: 10, lastDate: new Date("2020/07/01"), lastKm: 69629 }));
+        services.push(new Service({ name: "Fluído transmissão manual", months: 0, km: 260, lastDate: new Date("2018/04/01"), lastKm: 0 }));
+        services.push(new Service({ name: "Suspensão verificar", months: 24, km: 20, lastDate: new Date("2020/07/01"), lastKm: 69629 }));
+        services.push(new Service({ name: "Amortecedores dianteiros", months: 36, km: 30, lastDate: new Date("2018/04/01"), lastKm: 0 }));
+        services.push(new Service({ name: "Amortecedores traseiros", months: 36, km: 30, lastDate: new Date("2023/02/01"), lastKm: 86767 }));
+        services.push(new Service({ name: "Fluido do freio substituir", months: 24, km: 0, lastDate: new Date("2023/09/01"), lastKm: 0 }));
+        services.push(new Service({ name: "Fluido do freio verificar tubulações e mangueiras flexíveis", months: 36, km: 30, lastDate: new Date("2020/07/01"), lastKm: 69629 }));
+        services.push(new Service({ name: "Pneus Dianteiros", months: 36, km: 30, lastDate: new Date("2023/10/01"), lastKm: 59000 }));
+        services.push(new Service({ name: "Pneus Traseiros", months: 36, km: 30, lastDate: new Date("2018/04/01"), lastKm: 45000 }));
+        services.push(new Service({ name: "Pastilhas e discos de freio", months: 36, km: 30, lastDate: new Date("2019/04/01"), lastKm: 59000 }));
+        services.push(new Service({ name: "Sistema de refrigeração", months: 36, km: 30, lastDate: new Date("2018/04/01"), lastKm: 0 }));
+        services.push(new Service({ name: "Higienização ar condicionado", months: 6, km: 0, lastDate: new Date("2024/11/01"), lastKm: 0 }));
+        services.push(new Service({ name: "Bateria", months: 48, km: 0, lastDate: null, lastKm: 0 }));
+
+
+        document.querySelector('#dv-services').innerHTML = serviceToHTML(services);
+    </script>
+</body>
+
+</html>
