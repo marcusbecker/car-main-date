@@ -82,40 +82,49 @@
             return inKm.toLocaleString(strLocation);
         }
 
+        function dateToState(currentDate, endDate) {
+            if (endDate) {
+                const intermedDate = new Date(endDate);
+                intermedDate.setMonth(intermedDate.getMonth() - 2);
+
+                if (currentDate >= endDate) {
+                    return 3;
+                } else if (intermedDate >= endDate) {
+                    return 2;
+                } else {
+                    return 1;
+                }
+            }
+
+            return 0;
+        }
+
+        function kmToState(currentKm, endKm) {
+            if (endKm > 0) {
+                const intermedKm = endKm - 500;
+                if (currentKm >= endKm) {
+                    return 3;
+                } else if (intermedKm >= endKm) {
+                    return 2;
+                } else {
+                    return 1;
+                }
+            }
+
+            return 0;
+        }
+
         function serviceToHTML(services, currentKm, currentDate) {
             let content = "";
 
             services.forEach(s => {
                 const endKm = s.getValidateKm(currentKm);
-                const intermedKm = endKm > 0 ? s.getValidateKm(endKm) - 500 : 0;
-
                 const endDate = s.getValidateDate(currentDate);
-                const intermedDate = endDate ? new Date(endDate) : new Date();
-                intermedDate.setMonth(intermedDate.getMonth() - 2);
+                
+                const kmState = kmToState(currentKm, endKm);
+                const dateState = dateToState(currentDate, endDate);
+                const state = Math.max(kmState, dateState);
 
-                let dateState = 0;
-                if (endDate) {
-                    if (currentDate >= endDate) {
-                        dateState = 3;
-                    } else if (intermedDate >= endDate) {
-                        dateState = 2;
-                    } else {
-                        dateState = 1;
-                    }
-                }
-
-                let kmState = 0;
-                if (endKm > 0) {
-                    if (currentKm >= endKm) {
-                        kmState = 3;
-                    } else if (intermedKm >= endKm) {
-                        kmState = 2;
-                    } else {
-                        kmState = 1;
-                    }
-                }
-
-                const state = Math.max(dateState, kmState);
                 let stateClass = "circle";
                 if (state == 3) {
                     stateClass += " circle_warning";
@@ -123,7 +132,6 @@
                     stateClass += " circle_information";
                 }
 
-                //content += ``;
                 content += `<div class="service-detail"><div class="${stateClass}"></div><h2>${s.service.name}</h2>`;
                 content += `<strong>Change info</strong><p>Months: ${s.service.months} Km: ${frmKm(s.service.km * 1000, "pt-BR")}</p>`;
                 content += `<p><strong>Next Change info</strong></p>`;
