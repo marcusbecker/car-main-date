@@ -28,7 +28,6 @@
         </div>
     </div>
 
-
     <script>
         //Automobile
         //Maintenance
@@ -69,34 +68,42 @@
             let content = "";
 
             services.forEach(s => {
-                const valDate = s.getValidateDate(currentDate);
-                const ValKm = s.getValidateKm(currentKm);
+                const endKm = s.getValidateKm(currentKm);
+                const intermedKm = endKm > 0 ? s.getValidateKm(endKm) - 500 : 0;
+
+                const endDate = s.getValidateDate(currentDate);
+                const intermedDate = endDate ? new Date(endDate) : new Date();
+                intermedDate.setMonth(intermedDate.getMonth() - 2);
 
                 content += `<div class="service-detail"><h2>${s.service.name}</h2>`;
                 content += `<strong>Change info</strong><p>Months: ${s.service.months} Km: ${frmKm(s.service.km * 1000, "pt-BR")}</p>`;
                 content += `<p><strong>Next Change info</strong></p>`;
 
-                if (valDate) {
-                    if (currentDate >= valDate) {
+                if (endDate) {
+                    if (currentDate >= endDate) {
                         content += `<span class="cls-urgente">!!!</span>`;
+                    } else if (intermedDate >= endDate) {
+                        content += `<span class="cls-urgente">%%%</span>`;
                     } else {
                         content += `<span class="cls-okay"></span>`;
                     }
 
-                    content += `<span><strong>Date to next change</strong> ${frmDate(valDate, "pt-BR")}</span></br>`;
+                    content += `<span><strong>Date to next change</strong> ${frmDate(endDate, "pt-BR")}</span></br>`;
                 }
 
-                if (ValKm > 0) {
-                    if (currentKm >= ValKm) {
+                if (endKm > 0) {
+                    if (currentKm >= endKm) {
                         content += `<span class="cls-urgente">!!!</span>`;
+                    } else if(intermedKm >= endKm){
+                        content += `<span class="cls-urgente">%%%</span>`;
                     } else {
                         content += `<span class="cls-okay"></span>`;
                     }
 
-                    content += `<span><strong>Km to next change</strong> ${frmKm(ValKm, "pt-BR")}</span></br>`;
+                    content += `<span><strong>Km to next change</strong> ${frmKm(endKm, "pt-BR")}</span></br>`;
                 }
 
-                content += `</div>`;                
+                content += `</div>`;
             });
 
             return content;
