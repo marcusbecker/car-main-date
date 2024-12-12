@@ -6,13 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
+        body {
+            background-color: #edebeb;
+        }
+
         .service-detail {
             float: left;
-            background-color: #edebeb;
             width: 250px;
             padding: 6px;
             height: 295px;
             margin: 6px;
+            background-color: #f5f5f5;
+            opacity: 0.8;
+            box-shadow: 0 0 6px rgb(26 53 69);
         }
 
         .circle {
@@ -120,7 +126,7 @@
             services.forEach(s => {
                 const endKm = s.getValidateKm(currentKm);
                 const endDate = s.getValidateDate(currentDate);
-                
+
                 const kmState = kmToState(currentKm, endKm);
                 const dateState = dateToState(currentDate, endDate);
                 const state = Math.max(kmState, dateState);
@@ -136,7 +142,6 @@
                 content += `<strong>Change info</strong><p>Months: ${s.service.months} Km: ${frmKm(s.service.km * 1000, "pt-BR")}</p>`;
                 content += `<p><strong>Next Change info</strong></p>`;
 
-                //content += `<span class="cls-urgente">!!!</span>`;
                 if (endDate) {
                     content += `<span><strong>Date to next change</strong> ${frmDate(endDate, "pt-BR")}</span></br>`;
                 }
@@ -173,7 +178,7 @@
         services.push(new Service({ name: "Pastilhas e discos de freio", months: 36, km: 30, lastDate: new Date("2019/04/01"), lastKm: 59000 }));
         services.push(new Service({ name: "Sistema de refrigeração", months: 36, km: 30, lastDate: new Date("2018/04/01"), lastKm: 0 }));
         services.push(new Service({ name: "Higienização ar condicionado", months: 6, km: 0, lastDate: new Date("2024/11/01"), lastKm: 0 }));
-        services.push(new Service({ name: "Bateria", months: 48, km: 0, lastDate: null, lastKm: 0 }));
+        services.push(new Service({ name: "Bateria", months: 48, km: 0, lastDate: new Date("2021/06/01"), lastKm: 0 }));
 
         const carKm = 87000;
         const dt = new Date();
