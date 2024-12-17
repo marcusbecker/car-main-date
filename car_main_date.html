@@ -42,6 +42,12 @@
 </head>
 
 <body>
+    <div id="dv-input">
+        <h2>Car data</h2>
+        <span><filed>Current Km:</filed> <input type="number" id="car_km" name="car_km" value="99000" /></span>
+        <span><filed>Current Date:</filed> <input type="date" id="car_date" name="car_date" value="" /></span>
+        <button id="btn_car_submit">Submit</button>
+    </div>
     <div id="dv-services">
         <div class="service-detail">
             <h2>Óleo motor + filtro</h2>
@@ -80,6 +86,12 @@
             }
         }
 
+        function loadServiceCards(){
+            const carKm = document.querySelector('#car_km').value;
+            const dt = new Date(document.querySelector('#car_date').value + 'T00:00:00');
+            document.querySelector('#dv-services').innerHTML = serviceToHTML(services, carKm, dt);
+        }
+        
         function frmDate(inDate, strLocation) {
             return inDate ? inDate.toLocaleDateString(strLocation) : '';
         }
@@ -142,7 +154,7 @@
                 content += `<p><strong>Change info</strong><br><b>Months:</b> ${s.service.months} <b>Km:</b> ${frmKm(s.service.km * 1000, "pt-BR")}</p>`;
                 content += `<p><strong>Last Change info</strong>:<br><b>Date:</b> ${frmDate(s.service.lastDate, "pt-BR")} <b>Km:</b> ${frmKm(s.service.lastKm, "pt-BR")}</p>`;
                
-                content += `<p><strong>Next Change info</strong>`;
+                content += `<p><strong>Next Change info:</strong>`;
                 if (endDate) {
                     content += `<br><span><strong>Date to next change</strong> ${frmDate(endDate, "pt-BR")}</span>`;
                 }
@@ -181,9 +193,18 @@
         services.push(new Service({ name: "Higienização ar condicionado", months: 6, km: 0, lastDate: new Date("2024/11/01"), lastKm: 97381 }));
         services.push(new Service({ name: "Bateria", months: 48, km: 0, lastDate: new Date("2021/06/01"), lastKm: 0 }));
 
-        const carKm = 99000;
-        const dt = new Date();
-        document.querySelector('#dv-services').innerHTML = serviceToHTML(services, carKm, dt);
+        
+        if(document.querySelector('#car_km').value === ''){
+            document.querySelector('#car_km').value = '1000';
+        }
+
+        if(document.querySelector('#car_date').value === ''){
+            document.querySelector('#car_date').value = new Date().toISOString().split('T')[0];
+        }
+
+        document.querySelector('#btn_car_submit').onclick = () =>{loadServiceCards();};
+
+        //loadServiceCards();
     </script>
 </body>
 
