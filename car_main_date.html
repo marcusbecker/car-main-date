@@ -96,7 +96,7 @@
 
                     if (currentDate >= endDate) {
                         return 3;
-                    } else if (intermedDate >= endDate) {
+                    } else if (currentDate >= intermedDate) {
                         return 2;
                     } else {
                         return 1;
@@ -111,7 +111,7 @@
                     const intermedKm = endKm - 500;
                     if (currentKm >= endKm) {
                         return 3;
-                    } else if (intermedKm >= endKm) {
+                    } else if (currentKm >= intermedKm) {
                         return 2;
                     } else {
                         return 1;
