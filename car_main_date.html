@@ -44,8 +44,12 @@
 <body>
     <div id="dv-input">
         <h2>Car data</h2>
-        <span><filed>Current Km:</filed> <input type="number" id="car_km" name="car_km" value="99000" /></span>
-        <span><filed>Current Date:</filed> <input type="date" id="car_date" name="car_date" value="" /></span>
+        <span>
+            <filed>Current Km:</filed> <input type="number" id="car_km" name="car_km" value="99000" />
+        </span>
+        <span>
+            <filed>Current Date:</filed> <input type="date" id="car_date" name="car_date" value="" />
+        </span>
         <button id="btn_car_submit">Submit</button>
     </div>
     <div id="dv-services">
@@ -84,89 +88,98 @@
 
                 return 0;
             }
+
+            dateToState(currentDate, endDate) {
+                if (endDate) {
+                    const intermedDate = new Date(endDate);
+                    intermedDate.setMonth(intermedDate.getMonth() - 2);
+
+                    if (currentDate >= endDate) {
+                        return 3;
+                    } else if (intermedDate >= endDate) {
+                        return 2;
+                    } else {
+                        return 1;
+                    }
+                }
+
+                return 0;
+            }
+
+            kmToState(currentKm, endKm) {
+                if (endKm > 0) {
+                    const intermedKm = endKm - 500;
+                    if (currentKm >= endKm) {
+                        return 3;
+                    } else if (intermedKm >= endKm) {
+                        return 2;
+                    } else {
+                        return 1;
+                    }
+                }
+
+                return 0;
+            }
         }
 
-        function loadServiceCards(){
+        class ConverterUtil {
+            frmDate(inDate, strLocation) {
+                return inDate ? inDate.toLocaleDateString(strLocation) : '';
+            }
+
+            frmKm(inKm, strLocation) {
+                return inKm ? inKm.toLocaleString(strLocation) : 0;
+            }
+        }
+
+        class ServiceHtmlView {
+            constructor(services) {
+                this.services = services;
+                this.converter = new ConverterUtil();
+            }
+
+            serviceToHTML(currentKm, currentDate) {
+                let content = "";
+
+                this.services.forEach(serv => {
+                    const endKm = serv.getValidateKm(currentKm);
+                    const endDate = serv.getValidateDate(currentDate);
+
+                    const kmState = serv.kmToState(currentKm, endKm);
+                    const dateState = serv.dateToState(currentDate, endDate);
+                    const state = Math.max(kmState, dateState);
+
+                    let stateClass = "circle";
+                    if (state == 3) {
+                        stateClass += " circle_warning";
+                    } else if (state == 2) {
+                        stateClass += " circle_information";
+                    }
+
+                    content += `<div class="service-detail"><div class="${stateClass}"></div><h2>${serv.service.name}</h2>`;
+                    content += `<p><strong>Change info</strong><br><b>Months:</b> ${serv.service.months} <b>Km:</b> ${this.converter.frmKm(serv.service.km * 1000, "pt-BR")}</p>`;
+                    content += `<p><strong>Last Change info</strong>:<br><b>Date:</b> ${this.converter.frmDate(serv.service.lastDate, "pt-BR")} <b>Km:</b> ${this.converter.frmKm(serv.service.lastKm, "pt-BR")}</p>`;
+
+                    content += `<p><strong>Next Change info:</strong>`;
+                    if (endDate) {
+                        content += `<br><span><strong>Date to next change</strong> ${this.converter.frmDate(endDate, "pt-BR")}</span>`;
+                    }
+
+                    if (endKm > 0) {
+                        content += `<br><span><strong>Km to next change</strong> ${this.converter.frmKm(endKm, "pt-BR")}</span>`;
+                    }
+
+                    content += `</p></div>`;
+                });
+
+                return content;
+            }
+        }
+
+        function loadServiceCards() {
             const carKm = document.querySelector('#car_km').value;
             const dt = new Date(document.querySelector('#car_date').value + 'T00:00:00');
-            document.querySelector('#dv-services').innerHTML = serviceToHTML(services, carKm, dt);
-        }
-        
-        function frmDate(inDate, strLocation) {
-            return inDate ? inDate.toLocaleDateString(strLocation) : '';
-        }
-
-        function frmKm(inKm, strLocation) {
-            return inKm ? inKm.toLocaleString(strLocation) : 0;
-        }
-
-        function dateToState(currentDate, endDate) {
-            if (endDate) {
-                const intermedDate = new Date(endDate);
-                intermedDate.setMonth(intermedDate.getMonth() - 2);
-
-                if (currentDate >= endDate) {
-                    return 3;
-                } else if (intermedDate >= endDate) {
-                    return 2;
-                } else {
-                    return 1;
-                }
-            }
-
-            return 0;
-        }
-
-        function kmToState(currentKm, endKm) {
-            if (endKm > 0) {
-                const intermedKm = endKm - 500;
-                if (currentKm >= endKm) {
-                    return 3;
-                } else if (intermedKm >= endKm) {
-                    return 2;
-                } else {
-                    return 1;
-                }
-            }
-
-            return 0;
-        }
-
-        function serviceToHTML(services, currentKm, currentDate) {
-            let content = "";
-
-            services.forEach(s => {
-                const endKm = s.getValidateKm(currentKm);
-                const endDate = s.getValidateDate(currentDate);
-
-                const kmState = kmToState(currentKm, endKm);
-                const dateState = dateToState(currentDate, endDate);
-                const state = Math.max(kmState, dateState);
-
-                let stateClass = "circle";
-                if (state == 3) {
-                    stateClass += " circle_warning";
-                } else if (state == 2) {
-                    stateClass += " circle_information";
-                }
-
-                content += `<div class="service-detail"><div class="${stateClass}"></div><h2>${s.service.name}</h2>`;
-                content += `<p><strong>Change info</strong><br><b>Months:</b> ${s.service.months} <b>Km:</b> ${frmKm(s.service.km * 1000, "pt-BR")}</p>`;
-                content += `<p><strong>Last Change info</strong>:<br><b>Date:</b> ${frmDate(s.service.lastDate, "pt-BR")} <b>Km:</b> ${frmKm(s.service.lastKm, "pt-BR")}</p>`;
-               
-                content += `<p><strong>Next Change info:</strong>`;
-                if (endDate) {
-                    content += `<br><span><strong>Date to next change</strong> ${frmDate(endDate, "pt-BR")}</span>`;
-                }
-
-                if (endKm > 0) {
-                    content += `<br><span><strong>Km to next change</strong> ${frmKm(endKm, "pt-BR")}</span>`;
-                }
-
-                content += `</p></div>`;
-            });
-
-            return content;
+            document.querySelector('#dv-services').innerHTML = new ServiceHtmlView(services).serviceToHTML(carKm, dt);
         }
 
         const services = [];
@@ -184,8 +197,8 @@
         services.push(new Service({ name: "Suspensão verificar", months: 24, km: 20, lastDate: new Date("2020/07/01"), lastKm: 69629 }));
         services.push(new Service({ name: "Amortecedores dianteiros", months: 36, km: 30, lastDate: new Date("2018/04/01"), lastKm: 0 }));
         services.push(new Service({ name: "Amortecedores traseiros", months: 36, km: 30, lastDate: new Date("2023/02/01"), lastKm: 86767 }));
-        services.push(new Service({ name: "Fluido do freio substituir", months: 24, km: 0, lastDate: new Date("2023/09/01"), lastKm: 0 }));
-        services.push(new Service({ name: "Fluido do freio verificar tubulações e mangueiras flexíveis", months: 36, km: 30, lastDate: new Date("2020/07/01"), lastKm: 69629 }));
+        services.push(new Service({ name: "Fluído do freio substituir", months: 24, km: 0, lastDate: new Date("2023/09/01"), lastKm: 0 }));
+        services.push(new Service({ name: "Fluído do freio verificar tubulações e mangueiras flexíveis", months: 36, km: 30, lastDate: new Date("2020/07/01"), lastKm: 69629 }));
         services.push(new Service({ name: "Pneus Dianteiros", months: 36, km: 30, lastDate: new Date("2023/10/01"), lastKm: 59000 }));
         services.push(new Service({ name: "Pneus Traseiros", months: 36, km: 30, lastDate: new Date("2018/04/01"), lastKm: 45000 }));
         services.push(new Service({ name: "Pastilhas e discos de freio", months: 36, km: 30, lastDate: new Date("2019/04/01"), lastKm: 59000 }));
@@ -193,18 +206,17 @@
         services.push(new Service({ name: "Higienização ar condicionado", months: 6, km: 0, lastDate: new Date("2024/11/01"), lastKm: 97381 }));
         services.push(new Service({ name: "Bateria", months: 48, km: 0, lastDate: new Date("2021/06/01"), lastKm: 0 }));
 
-        
-        if(document.querySelector('#car_km').value === ''){
+        if (document.querySelector('#car_km').value === '') {
             document.querySelector('#car_km').value = '1000';
         }
 
-        if(document.querySelector('#car_date').value === ''){
+        if (document.querySelector('#car_date').value === '') {
             document.querySelector('#car_date').value = new Date().toISOString().split('T')[0];
         }
 
-        document.querySelector('#btn_car_submit').onclick = () =>{loadServiceCards();};
+        document.querySelector('#btn_car_submit').onclick = () => { loadServiceCards(); };
 
-        //loadServiceCards();
+        loadServiceCards();
     </script>
 </body>
 
