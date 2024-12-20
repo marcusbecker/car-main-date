@@ -69,22 +69,23 @@
         function loadServiceCards() {
             const carKm = document.querySelector('#car_km').value;
             const dt = new Date(document.querySelector('#car_date').value + 'T00:00:00');
+            const services = new DataService().data;
+
             document.querySelector('#dv-services').innerHTML = new ServiceHtmlView(services).serviceToHTML(carKm, dt);
         }
 
-        const services = new DataService().data;
+        window.onload = () => {
+            if (document.querySelector('#car_km').value === '') {
+                document.querySelector('#car_km').value = '1000';
+            }
 
-        if (document.querySelector('#car_km').value === '') {
-            document.querySelector('#car_km').value = '1000';
+            if (document.querySelector('#car_date').value === '') {
+                document.querySelector('#car_date').value = new Date().toISOString().split('T')[0];
+            }
+
+            document.querySelector('#btn_car_submit').onclick = () => { loadServiceCards(); };
+            loadServiceCards();
         }
-
-        if (document.querySelector('#car_date').value === '') {
-            document.querySelector('#car_date').value = new Date().toISOString().split('T')[0];
-        }
-
-        document.querySelector('#btn_car_submit').onclick = () => { loadServiceCards(); };
-
-        loadServiceCards();
     </script>
 </body>
 
